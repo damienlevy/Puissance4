@@ -12,7 +12,7 @@
 
 // Paramètres du jeu
 #define LARGEUR_MAX 42 		// nb max de fils pour un noeud (= nb max de coups possibles)
-
+#define NBJETONALIGNER 4
 #define TEMPS 5		// temps de calcul pour un coup avec MCTS (en secondes)
 
 #define COLONNE 7
@@ -113,25 +113,41 @@ Coup * nouveauCoup( int i, int j ) {
   // TODO: à compléter avec la création d'un nouveau coup
 	
   /* par exemple : */
+  
   coup->ligne = i;
   coup->colonne = j;
 	
   return coup;
 }
 
+// Nouveau coup 
+// TODO: adapter la liste de paramètres au jeu
+Coup * nouveauCoupcolonne( int j ,Etat * etat) {
+  Coup * coup = (Coup *)malloc(sizeof(Coup));
+	
+  // TODO: à compléter avec la création d'un nouveau coup
+  int i = 0;
+  /* par exemple : */
+  while (i < LIGNE && etat->plateau[i][j] == ' '){
+    i++;
+  }
+  
+  coup->ligne = i-1;
+  coup->colonne = j;
+	
+  return coup;
+}
 // Demander à l'humain quel coup jouer 
-Coup * demanderCoup () {
+Coup * demanderCoup (Etat * etat) {
 
   // TODO...
 
   /* par exemple : */
-  int i,j;
-  printf("\n quelle ligne ? ") ;
-  scanf("%d",&i); 
+  int j;
   printf(" quelle colonne ? ") ;
   scanf("%d",&j); 
 	
-  return nouveauCoup(i,j);
+  return nouveauCoupcolonne(j,etat);
 }
 
 // Modifier l'état en jouant un coup 
@@ -165,11 +181,20 @@ Coup ** coups_possibles( Etat * etat ) {
 	
   /* par exemple */
   int i,j;
-  for(i=0; i < LIGNE; i++) {
-    for (j=0; j < COLONNE; j++) {
-      if ( etat->plateau[i][j] == ' ' ) {
-	coups[k] = nouveauCoup(i,j); 
-	k++;
+  
+  for (j=0; j < COLONNE; j++) {
+    for(i=0; i < LIGNE; i++) {
+      if ( etat->plateau[i][j] != ' ' || i==LIGNE-1) {
+	if (i==LIGNE-1 && etat->plateau[i][j] == ' '){
+	  coups[k] = nouveauCoup(i,j); 
+	  k++;
+	}
+	else{
+	  if ( i !=0){
+	    coups[k] = nouveauCoup(i-1,j); 
+	    k++;
+	  }
+	}
       }
     }
   }
@@ -268,36 +293,36 @@ FinDePartie testFin( Etat * etat ) {
 			
 	// lignes
 	k=0;
-	while ( k < 3 && i+k < LIGNE && etat->plateau[i+k][j] == etat->plateau[i][j] ) 
+	while ( k < NBJETONALIGNER && i+k < LIGNE && etat->plateau[i+k][j] == etat->plateau[i][j] ) 
 	  k++;
-	if ( k == 3 ) 
+	if ( k == NBJETONALIGNER ) 
 	  return etat->plateau[i][j] == 'O'? ORDI_GAGNE : HUMAIN_GAGNE;
 
 	// colonnes
 	k=0;
-	while ( k < 3 && j+k < COLONNE && etat->plateau[i][j+k] == etat->plateau[i][j] ) 
+	while ( k < NBJETONALIGNER && j+k < COLONNE && etat->plateau[i][j+k] == etat->plateau[i][j] ) 
 	  k++;
-	if ( k == 3 ) 
+	if ( k == NBJETONALIGNER ) 
 	  return etat->plateau[i][j] == 'O'? ORDI_GAGNE : HUMAIN_GAGNE;
 
 	// diagonales
 	k=0;
-	while ( k < 3 && i+k < LIGNE && j+k < COLONNE && etat->plateau[i+k][j+k] == etat->plateau[i][j] ) 
+	while ( k < NBJETONALIGNER && i+k < LIGNE && j+k < COLONNE && etat->plateau[i+k][j+k] == etat->plateau[i][j] ) 
 	  k++;
-	if ( k == 3 ) 
+	if ( k == NBJETONALIGNER ) 
 	  return etat->plateau[i][j] == 'O'? ORDI_GAGNE : HUMAIN_GAGNE;
 
 	k=0;
-	while ( k < 3 && i+k < LIGNE && j-k >= 0 && etat->plateau[i+k][j-k] == etat->plateau[i][j] ) 
+	while ( k < NBJETONALIGNER && i+k < LIGNE && j-k >= 0 && etat->plateau[i+k][j-k] == etat->plateau[i][j] ) 
 	  k++;
-	if ( k == 3 ) 
+	if ( k == NBJETONALIGNER ) 
 	  return etat->plateau[i][j] == 'O'? ORDI_GAGNE : HUMAIN_GAGNE;		
       }
     }
   }
 
   // et sinon tester le match nul	
-  if ( n == 3*3 ) 
+  if ( n == LIGNE*COLONNE ) 
     return MATCHNUL;
 		
   return NON;
@@ -383,7 +408,7 @@ int main(void) {
       // tour de l'humain
 			
       do {
-	coup = demanderCoup();
+	coup = demanderCoup(etat);
       } while ( !jouerCoup(etat, coup) );
 									
     }
