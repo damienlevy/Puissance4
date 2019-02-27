@@ -353,6 +353,8 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
     enfant = ajouterEnfant(racine, coups[k]);
     k++;
   }
+  
+  
 	
 	
   meilleur_coup = coups[ rand()%k ]; // choix aléatoire
@@ -360,12 +362,30 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
   /*  TODO :
       - supprimer la sélection aléatoire du meilleur coup ci-dessus
       - implémenter l'algorithme MCTS-UCT pour déterminer le meilleur coup ci-dessous
-
+*/
       int iter = 0;
-	
+      int cmp;
+      FinDePartie fp;
       do {
-	
-	
+	cmp=0;
+	do {
+	  enfant = racine->enfants[rand()%racine->nb_enfants];
+	  cmp++;
+	}while (enfant->nb_simus >= 1 && cmp< racine->nb_enfants);
+	if (cmp > racine->nb_enfants){
+	  enfant = racine->enfants[rand()%racine->nb_enfants];
+	}
+	racine = enfant;
+	racine->nb_simus++;
+	fp = testFin(racine->etat);
+	if (fp!= NON){
+	  do {
+	    if (fp== ORDI_GAGNE){
+	      racine->nb_victoires++;
+	    }
+	    racine = racine->parent;
+	  }while(racine->parent !=NULL);
+	}
 	
       // à compléter par l'algorithme MCTS-UCT... 
 	
@@ -400,6 +420,7 @@ int main(void) {
   scanf("%d", &(etat->joueur) );
 	
   // boucle de jeu
+  srand(time(NULL));
   do {
     printf("\n");
     afficheJeu(etat);
