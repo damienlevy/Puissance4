@@ -327,7 +327,18 @@ FinDePartie testFin( Etat * etat ) {
 		
   return NON;
 }
+float b_value(Noeud * noeud, int c){
+  float b = 0.0;
+  if(noeud->etat->joueur == 0){
+    b =  -((noeud->nb_victoires/noeud->nb_simus) + c * sqrt(log(noeud->parent->nb_simus)/noeud->nb_simus));
 
+  }else{
+    b =  ((noeud->nb_victoires/noeud->nb_simus) + c * sqrt(log(noeud->parent->nb_simus)/noeud->nb_simus));
+
+  }
+  return b; 
+
+}
 
 
 // Calcule et joue un coup de l'ordinateur avec MCTS-UCT
