@@ -11,9 +11,9 @@
 #include <time.h>
 
 // Paramètres du jeu
-#define LARGEUR_MAX 42 		// nb max de fils pour un noeud (= nb max de coups possibles)
+#define LARGEUR_MAX 8		// nb max de fils pour un noeud (= nb max de coups possibles)
 #define NBJETONALIGNER 4
-#define TEMPS 5		// temps de calcul pour un coup avec MCTS (en secondes)
+#define TEMPS 2		// temps de calcul pour un coup avec MCTS (en secondes)
 
 #define COLONNE 7
 #define LIGNE 6
@@ -106,7 +106,7 @@ void afficheJeu(Etat * etat) {
 
 
 // Nouveau coup 
-// TODO: adapter la liste de paramètres au jeu
+// TODO: adapter la liste de paramètres 42au jeu
 Coup * nouveauCoup( int i, int j ) {
   Coup * coup = (Coup *)malloc(sizeof(Coup));
 	
@@ -327,20 +327,49 @@ FinDePartie testFin( Etat * etat ) {
 		
   return NON;
 }
-float b_value(Noeud * noeud, int c){
+float b_value(Noeud * noeud, float c){
   float b = 0.0;
+  
+      
+      if(noeud->nb_simus != 0){
   if(noeud->etat->joueur == 0){
+    
+      
     b =  -((noeud->nb_victoires/noeud->nb_simus) + c * sqrt(log(noeud->parent->nb_simus)/noeud->nb_simus));
 
   }else{
+
     b =  ((noeud->nb_victoires/noeud->nb_simus) + c * sqrt(log(noeud->parent->nb_simus)/noeud->nb_simus));
 
+  }}else{
+   b = 0; 
   }
+
   return b; 
 
 }
 
-
+Coup * meilleurCoup(Noeud* noeud){
+  
+  Noeud* n = noeud->enfants[0];
+  int i;
+  
+    
+  for (i=1 ; i<noeud->nb_enfants;i++){
+    
+     
+    if (b_value(noeud->enfants[i],1.41)>b_value(n,1.41)){
+      
+      
+      n = noeud->enfants[i];
+    }
+    
+      
+  }
+  
+  
+  return n->coup;
+}
 // Calcule et joue un coup de l'ordinateur avec MCTS-UCT
 // en tempsmax secondes
 void ordijoue_mcts(Etat * etat, int tempsmax) {
@@ -357,9 +386,10 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
   racine->etat = copieEtat(etat); 
 	
   // créer les premiers noeuds:
+  Noeud * enfant;
   coups = coups_possibles(racine->etat); 
   int k = 0;
-  Noeud * enfant;
+  
   while ( coups[k] != NULL) {
     enfant = ajouterEnfant(racine, coups[k]);
     k++;
@@ -377,16 +407,20 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
       int iter = 0;
       int cmp;
       FinDePartie fp;
+    /*  
       do {
 	cmp=0;
 	do {
 	  enfant = racine->enfants[rand()%racine->nb_enfants];
 	  cmp++;
 	}while (enfant->nb_simus >= 1 && cmp< racine->nb_enfants);
+	
 	if (cmp > racine->nb_enfants){
+	   
 	  enfant = racine->enfants[rand()%racine->nb_enfants];
 	}
 	racine = enfant;
+	
 	racine->nb_simus++;
 	fp = testFin(racine->etat);
 	if (fp!= NON){
@@ -396,6 +430,17 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
 	    }
 	    racine = racine->parent;
 	  }while(racine->parent !=NULL);
+	  racine->nb_simus++;
+	}else{
+	  if (racine->nb_simus-1 < 1){
+	    coups = coups_possibles(racine->etat); 
+	    k = 0;
+      
+	    while ( coups[k] != NULL) {
+	      enfant = ajouterEnfant(racine, coups[k]);
+	      k++;
+	    }
+	  }
 	}
 	
       // à compléter par l'algorithme MCTS-UCT... 
@@ -411,8 +456,8 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
       /* fin de l'algorithme  */ 
 	
   // Jouer le meilleur premier coup
-  jouerCoup(etat, meilleur_coup );
-	
+  //jouerCoup(etat, meilleurCoup(racine) );
+	jouerCoup(etat, meilleur_coup );
   // Penser à libérer la mémoire :
   freeNoeud(racine);
   free (coups);
