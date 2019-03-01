@@ -1,5 +1,8 @@
 Réponses aux questions : 
+2 / a 4 secondes l'ia gagne tout le temps   
 4 / compiler avec gcc -O3 permet d'optimiser le programme et d'executer plus d'itération dans un même temps.
 exemple :
  sans -O3 :
+ 
+ 
  
