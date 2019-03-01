@@ -15,6 +15,8 @@ Réponses aux questions :
 
 2 / à partir de 1 secondes l'ia nous bats à chaque coup.
 
+3 / L'ia nous bat plus rapidement avec le choix du coup gagnant lorsque cela est possible.
+
 
 4 / compiler avec gcc -O3 permet d'optimiser le programme et d'executer plus d'itération dans un même temps.
 exemple :
