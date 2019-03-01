@@ -1,8 +1,31 @@
-Réponses aux questions : 
-2 / a 4 secondes l'ia gagne tout le temps   
+Valentin COLLIGNON
+Damien LEVY			RAPPORT IA
+
+Fonctionnement du programme :
+
+Nous nous sommes basé sur le fichier jeu.c.
+Un coup est défini uniquement par une colonne et calcul la bonne ligne.
+Un état est :
+   un tableau en 2 dimensions de char de 7 colonnes et 6 lignes
+   un int qui défini le joueur
+Un noeud qui n'a pas été modifié.
+Le premier joueur joue son coup, si c'est l'humain il choisi une colonne et si c'est la machine elle utilise l'algorithme MCTS mis en place, suivi du 2e joueur. A chaque coup on vérifie que nous ne sommes pas dans un état final.
+
+Réponses aux questions :
+
+2 / à partir de 1 secondes l'ia nous bats à chaque coup.
+
+
 4 / compiler avec gcc -O3 permet d'optimiser le programme et d'executer plus d'itération dans un même temps.
 exemple :
  sans -O3 :
+      nombre de simulation : 105620 itérations pour le premier coup pour 3 secondes.
+ avec -O3 :
+      nombre de simulation : 219776 itérations pour le premier coup pour 3 secondes.
+
+
+
+6 / Estimation du temps de calcul nécessaire pour jouer le premier coup avec l'algorithme Minimax : O(7^42)
  
  
  
