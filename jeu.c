@@ -13,7 +13,7 @@
 // Paramètres du jeu
 #define LARGEUR_MAX 7		// nb max de fils pour un noeud (= nb max de coups possibles)
 #define NBJETONALIGNER 4
-#define TEMPS 4		// temps de calcul pour un coup avec MCTS (en secondes)
+#define TEMPS 1		// temps de calcul pour un coup avec MCTS (en secondes)
 
 #define COLONNE 7
 #define LIGNE 6
@@ -37,10 +37,7 @@ typedef struct EtatSt {
 
 // Definition du type Coup
 typedef struct {
-  // TODO: à compléter par la définition d'un coup 
-
-  /* par exemple, pour morpion: */
-  //int ligne;
+  
   int colonne;
 
 } Coup;
@@ -51,10 +48,6 @@ Etat * copieEtat( Etat * src ) {
 
   etat->joueur = src->joueur;
 	
-		
-  // TODO: à compléter avec la copie de l'état src dans etat
-	
-  /* par exemple : */
   int i,j;	
   for (i=0; i< LIGNE; i++)
     for ( j=0; j<COLONNE; j++)
@@ -69,9 +62,6 @@ Etat * copieEtat( Etat * src ) {
 Etat * etat_initial( void ) {
   Etat * etat = (Etat *)malloc(sizeof(Etat));
 	
-  // TODO: à compléter avec la création de l'état initial
-	
-  /* par exemple : */
   int i,j;	
   for (i=0; i< LIGNE; i++)
     for ( j=0; j< COLONNE; j++)
@@ -83,9 +73,6 @@ Etat * etat_initial( void ) {
 
 void afficheJeu(Etat * etat) {
 
-  // TODO: à compléter
-
-  /* par exemple : */
   int i,j;
   printf("   |");
   for ( j = 0; j < COLONNE; j++) 
@@ -106,43 +93,19 @@ void afficheJeu(Etat * etat) {
 
 
 // Nouveau coup 
-// TODO: adapter la liste de paramètres 42au jeu
 Coup * nouveauCoup( int j ) {
   Coup * coup = (Coup *)malloc(sizeof(Coup));
 	
-  // TODO: à compléter avec la création d'un nouveau coup
-	
-  /* par exemple : */
   
-  //coup->ligne = i;
   coup->colonne = j;
 	
   return coup;
 }
 
-// Nouveau coup 
-// TODO: adapter la liste de paramètres au jeu
-/*Coup * nouveauCoupcolonne( int j ,Etat * etat) {
-  Coup * coup = (Coup *)malloc(sizeof(Coup));
-	
-  // TODO: à compléter avec la création d'un nouveau coup
-  int i = 0;
-  
-  while (i < LIGNE && etat->plateau[i][j] == ' '){
-  i++;
-  }
-  
-  coup->ligne = i-1;
-  coup->colonne = j;
-	
-  return coup;
-  }*/
+
 // Demander à l'humain quel coup jouer 
 Coup * demanderCoup (Etat * etat) {
 
-  // TODO...
-
-  /* par exemple : */
   int j;
   printf(" quelle colonne ? ") ;
   scanf("%d",&j); 
@@ -180,9 +143,6 @@ Coup ** coups_possibles( Etat * etat ) {
 	
   int k = 0;
 	
-  // TODO: à compléter
-	
-  /* par exemple */
   int i,j;
   
   for (j=0; j < COLONNE; j++) {
@@ -276,9 +236,6 @@ void freeNoeud ( Noeud * noeud) {
 // et retourne NON, MATCHNUL, ORDI_GAGNE ou HUMAIN_GAGNE
 FinDePartie testFin( Etat * etat ) {
 
-  // TODO...
-	
-  /* par exemple	*/
 	
   // tester si un joueur a gagné
   int i,j,k,n = 0;
@@ -396,18 +353,16 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
   
 	
 	
-  //meilleur_coup = coups[ rand()%k ]; // choix aléatoire
-	
-  /*  TODO :
-      - supprimer la sélection aléatoire du meilleur coup ci-dessus
-      - implémenter l'algorithme MCTS-UCT pour déterminer le meilleur coup ci-dessous
-  */
+  
+  //implémentation de l'algorithme MCTS-UCT pour déterminer le meilleur coup ci-dessous
   int iter = 0;
   int cmp,cmpNonDev;
   int i,vic;
   FinDePartie fp;
   Noeud ** nNonDev = (Noeud **) malloc((1+LARGEUR_MAX) * sizeof(Noeud*) ); 
   cmp=0;
+  int coupGagnant= 0;
+  Coup * coup ;
   do {
     
     enfant = racine ;
@@ -452,6 +407,11 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
       
       vic = 1;
       cmp++;
+      if(enfant->parent->parent==NULL){
+        printf("beuh\n");
+        coupGagnant = 1;
+        coup = enfant->coup;
+      }
       }else{
 	vic = 0;
       }
@@ -467,16 +427,18 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
     temps = (int)( ((double) (toc - tic)) / CLOCKS_PER_SEC );
     iter ++;
   
-  } while ( temps < tempsmax );
+  } while ( temps < tempsmax &&coupGagnant==0);
   /* fin de l'algorithme  */
   
   // Jouer le meilleur premier coup
-  jouerCoup(etat, meilleurCoup(racine) );
+  if (coupGagnant){
+    jouerCoup(etat, coup );
+  }else{
+  jouerCoup(etat, meilleurCoup(racine) );}
   
   printf("nombre de victoire : %d\n",racine->nb_victoires);
   printf("nombre de simulations : %d\n",iter);
   printf("probabilite de victoire : %f\n",(float)racine->nb_victoires/iter);
-  //jouerCoup(etat, meilleur_coup );
   // Penser à libérer la mémoire :
   free (coups);
   freeNoeud(racine);
