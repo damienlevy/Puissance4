@@ -13,7 +13,7 @@ Le premier joueur joue son coup, si c'est l'humain il choisi une colonne et si c
 
 Réponses aux questions :
 
-2 / à partir de 2 secondes l'ia nous bats à chaque coup.
+2 / à partir de 1 secondes l'ia nous bats à chaque coup.
 
 
 4 / compiler avec gcc -O3 permet d'optimiser le programme et d'executer plus d'itération dans un même temps.
